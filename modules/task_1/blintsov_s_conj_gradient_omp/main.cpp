@@ -1,10 +1,7 @@
-//
-// Created by Blintsov Sergey on 10/03/2019.
-//
+// Copyright 2019 SBlincov
 #include <ctime>
 #include <cmath>
 #include <iostream>
-using namespace std;
 
 #define DEM 3
 #define EPS 0.001
@@ -16,10 +13,10 @@ float Rk[DEM], Sz[DEM], alpha, beta, mf;
 float Spr, Spr1, Spz;
 
 float solve(float A[DEM][DEM], float F[DEM]) {
-    int i,j,kl=1;
+    int i, j, kl = 1;
     int MAX_ITERATIONS = 32767;
 
-    for (mf = 0,i = 0; i < DEM; i++) {
+    for (mf = 0, i = 0; i < DEM; i++) {
         mf += F[i] * F[i];
     }
 
@@ -28,7 +25,7 @@ float solve(float A[DEM][DEM], float F[DEM]) {
     }
 
     for (i = 0; i < DEM; i++) {
-        for (Sz[i]=0,j = 0; j < DEM; j++)
+        for (Sz[i]=0, j = 0; j < DEM; j++)
             Sz[i] += A[i][j] * Xk[j];
         Rk[i] = F[i] - Sz[i];
         Zk[i] = Rk[i];
@@ -62,37 +59,36 @@ float solve(float A[DEM][DEM], float F[DEM]) {
 
         for (i = 0; i < DEM; i++)
             Zk[i] = Rk[i] + beta * Zk[i];
-
     } while (Spr1 / mf > EPS * EPS && iterationCounter < MAX_ITERATIONS);
 
-    cout << "Ответ:"<< endl;
+    std::cout << "Ответ:"<< std::endl;
     for (i = 0; i < DEM; i++)
-        cout << "(" << Xk[i] << ")" << endl;
+        std::cout << "(" << Xk[i] << ")" << std::endl;
 
     return 0;
 }
 
 
 int main() {
-    srand(time(0));
+    auto seed = static_cast<unsigned int>(time(0));
 
-    cout << "A:" << endl;
+    std::cout << "A:" << std::endl;
     for (int i = 0; i < DEM; i++) {
-        cout << "( ";
+        std::cout << "( ";
         for (int j = 0; j < DEM; j++) {
-            A[i][i] = rand() % 2;
+            A[i][i] = rand_r(&seed) % 100;
             if ((i != j) && (i < j)) {
-                A[i][j] = rand() % 2 - rand() % 2;
+                A[i][j] = rand_r(&seed) % 100;
             }
             A[j][i] = A[i][j];
-            cout << A[j][i] << " ";
+            std::cout << A[j][i] << " ";
         }
-        cout << ")" << endl;
+        std::cout << ")" << std::endl;
     }
-    cout << "b:" << endl;
-    for (int j = 0; j < DEM; j++){
-        F[j] = rand() % 2 - rand() % 2;
-        cout << "( " << F[j] << " )" << endl;
+    std::cout << "b:" << std::endl;
+    for (int j = 0; j < DEM; j++) {
+        F[j] = rand_r(&seed) % 100;
+        std::cout << "( " << F[j] << " )" << std::endl;
     }
 // Задаем вручную:
 //    A[0][0] = 3;
@@ -110,8 +106,8 @@ int main() {
 //    F[2] = 9;
 
     clock_t time = clock();
-    solve(A,F);
+    solve(A, F);
     time = clock() - time;
-    cout << "Время выполнения = " << static_cast<double>(time) << "мс" << endl;
+    std::cout << "Время выполнения = " << static_cast<double>(time) << "мс" << std::endl;
     return 0;
 }
