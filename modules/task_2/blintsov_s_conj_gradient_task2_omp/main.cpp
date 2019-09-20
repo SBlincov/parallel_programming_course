@@ -4,7 +4,7 @@
 #include <iostream>
 #include "omp.h"
 
-#define DEM 400
+#define DEM 1000
 #define EPS 0.001
 
 float A[DEM][DEM];
@@ -74,7 +74,9 @@ float omp_solve(float A[DEM][DEM], float F[DEM]) {
     int i, j, kl = 1;
     int MAX_ITERATIONS = 32767;
 
-    for (mf = 0, i = 0; i < DEM; i++) {
+    mf = 0;
+    #pragma omp parallel for reduction(+:mf)
+    for (i = 0; i < DEM; i++) {
         mf += F[i] * F[i];
     }
 
@@ -108,6 +110,7 @@ float omp_solve(float A[DEM][DEM], float F[DEM]) {
         alpha = Spr / Spz;
 
         Spr1 = 0;
+
         for (i = 0; i < DEM; i++) {
             Xk[i] += alpha * Zk[i];
             Rk[i] -= alpha * Sz[i];
