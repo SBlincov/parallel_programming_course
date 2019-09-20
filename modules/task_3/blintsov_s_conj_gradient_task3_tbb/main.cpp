@@ -3,7 +3,11 @@
 #include <cmath>
 #include <iostream>
 
-
+#include <tbb/tbb.h>
+#include <tbb/task_scheduler_init.h>
+#include <tbb/blocked_range.h>
+#include <tbb/parallel_for.h>
+#include <tbb/parallel_reduce.h>
 
 #define DEM 100
 #define EPS 0.001
@@ -71,12 +75,12 @@ float solve(float A[DEM][DEM], float F[DEM]) {
 }
 
 
-float omp_solve(float A[DEM][DEM], float F[DEM]) {
+float tbb_solve(float A[DEM][DEM], float F[DEM]) {
     int i, j, kl = 1;
     int MAX_ITERATIONS = 32767;
 
     mf = 0;
-    #pragma omp parallel for reduction(+:mf)
+
     for (i = 0; i < DEM; i++) {
         mf += F[i] * F[i];
     }
@@ -85,7 +89,7 @@ float omp_solve(float A[DEM][DEM], float F[DEM]) {
         Xk[i] = 0.2;
     }
 
-    #pragma omp parallel for
+
     for (i = 0; i < DEM; i++) {
         for (Sz[i]=0, j = 0; j < DEM; j++)
             Sz[i] += A[i][j] * Xk[j];
@@ -100,7 +104,7 @@ float omp_solve(float A[DEM][DEM], float F[DEM]) {
         Spz = 0;
         Spr = 0;
 
-        #pragma omp parallel for
+
         for (i = 0; i < DEM; i++) {
             for (Sz[i] = 0, j = 0; j < DEM; j++) {
                 Sz[i] += A[i][j] * Zk[j];
@@ -174,10 +178,10 @@ int main() {
     time = clock() - time;
     std::cout << "Время выполнения последовательной версии = " << static_cast<double>(time) << "мс" << std::endl;
 
-    clock_t omp_time = clock();
-    omp_solve(A, F);
-    omp_time = clock() - omp_time;
-    std::cout << "Время выполнения OMP версии = " << static_cast<double>(omp_time) << "мс" << std::endl;
+    clock_t tbb_time = clock();
+    tbb_solve(A, F);
+    tbb_time = clock() - tbb_time;
+    std::cout << "Время выполнения TBB версии = " << static_cast<double>(tbb_time) << "мс" << std::endl;
 
     return 0;
 }
