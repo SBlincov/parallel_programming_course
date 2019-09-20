@@ -1,0 +1,8 @@
+set(PROJECT_NAME "blintsov_s_conj_gradient_task2_omp")
+add_executable( ${PROJECT_NAME} main.cpp )
+if ( USE_OMP )
+    project( ${PROJECT_NAME} )
+    message( STATUS "-- " ${PROJECT_NAME} )
+else( USE_OMP )
+    message( STATUS "-- ${PROJECT_NAME} - NOT BUILD!"  )
+endif( USE_OMP )
